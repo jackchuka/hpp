@@ -4,6 +4,14 @@ CLI tool for searching Japanese restaurants using the [HotPepper Gourmet API](ht
 
 ## Install
 
+### Homebrew
+
+```bash
+brew install jackchuka/tap/hpp
+```
+
+### Go
+
 ```bash
 go install github.com/jackchuka/hpp@latest
 ```
