@@ -16,6 +16,14 @@ brew install jackchuka/tap/hpp
 go install github.com/jackchuka/hpp@latest
 ```
 
+### Agent Skill
+
+This repository includes a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill. Install the skill to search restaurants with natural language:
+
+```bash
+npx skills add jackchuka/hpp
+```
+
 ## Setup
 
 Get a free API key from [Recruit Web Service](https://webservice.recruit.co.jp/register/) and set it:
@@ -25,6 +33,16 @@ export HOTPEPPER_API_KEY=your_key_here
 ```
 
 ## Usage
+
+### Claude Code (natural language)
+
+Use `/restaurant-search` or just ask in conversation:
+
+```
+> find an izakaya near 浜松町 for 6 people with private rooms
+> ramen spots near Shibuya under 1500 yen
+> dinner for 10 in 新宿 with all-you-can-drink
+```
 
 ### Search restaurants
 
