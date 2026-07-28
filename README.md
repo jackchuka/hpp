@@ -1,5 +1,9 @@
 # hpp
 
+[![Test](https://github.com/jackchuka/hpp/actions/workflows/test.yml/badge.svg)](https://github.com/jackchuka/hpp/actions/workflows/test.yml)
+[![Release](https://img.shields.io/github/v/release/jackchuka/hpp?sort=semver)](https://github.com/jackchuka/hpp/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 CLI tool for searching Japanese restaurants using the [HotPepper Gourmet API](https://webservice.recruit.co.jp/doc/hotpepper/reference.html).
 
 ## Install
