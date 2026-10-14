@@ -2,8 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/google/go-querystring/query"
@@ -49,16 +51,22 @@ func (c *Client) Get(path string, params interface{}, out interface{}) error {
 	if err != nil {
 		return fmt.Errorf("encoding params: %w", err)
 	}
-	vals.Set("key", c.APIKey)
 	vals.Set("format", "json")
 
+	// The API only accepts the key as a query parameter; keep it out of error messages.
 	req, err := http.NewRequest("GET", u+"?"+vals.Encode(), nil)
 	if err != nil {
 		return fmt.Errorf("creating request: %w", err)
 	}
+	vals.Set("key", c.APIKey)
+	req.URL.RawQuery = vals.Encode()
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
+		var urlErr *url.Error
+		if errors.As(err, &urlErr) {
+			urlErr.URL = redactKey(urlErr.URL)
+		}
 		return fmt.Errorf("making request: %w", err)
 	}
 	defer func() { _ = resp.Body.Close() }()
@@ -80,4 +88,17 @@ func (c *Client) Get(path string, params interface{}, out interface{}) error {
 	}
 
 	return json.Unmarshal(raw, out)
+}
+
+func redactKey(rawURL string) string {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return "[invalid URL]"
+	}
+	q := u.Query()
+	if q.Has("key") {
+		q.Set("key", "REDACTED")
+		u.RawQuery = q.Encode()
+	}
+	return u.String()
 }
