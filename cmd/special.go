@@ -20,7 +20,7 @@ var specialListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List specials/features",
 	Example: `  hpp special list
-  hpp special list --category SPC0`,
+  hpp special list --category SPG4`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		apiKey := os.Getenv("HOTPEPPER_API_KEY")
 		if apiKey == "" {

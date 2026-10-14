@@ -4,37 +4,46 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"text/tabwriter"
+	"strings"
+
+	"github.com/mattn/go-runewidth"
 )
 
 type TableWriter struct {
-	w *tabwriter.Writer
+	out  io.Writer
+	rows [][]string
 }
 
 func NewTableWriter(out io.Writer, headers []string) *TableWriter {
-	w := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	for i, h := range headers {
-		if i > 0 {
-			_, _ = fmt.Fprint(w, "\t")
-		}
-		_, _ = fmt.Fprint(w, h)
-	}
-	_, _ = fmt.Fprintln(w)
-	return &TableWriter{w: w}
+	return &TableWriter{out: out, rows: [][]string{headers}}
 }
 
 func (t *TableWriter) Row(values ...string) {
-	for i, v := range values {
-		if i > 0 {
-			_, _ = fmt.Fprint(t.w, "\t")
-		}
-		_, _ = fmt.Fprint(t.w, v)
-	}
-	_, _ = fmt.Fprintln(t.w)
+	t.rows = append(t.rows, values)
 }
 
 func (t *TableWriter) Flush() {
-	_ = t.w.Flush()
+	var widths []int
+	for _, row := range t.rows {
+		for i, v := range row {
+			if i >= len(widths) {
+				widths = append(widths, 0)
+			}
+			widths[i] = max(widths[i], runewidth.StringWidth(v))
+		}
+	}
+	for _, row := range t.rows {
+		var b strings.Builder
+		for i, v := range row {
+			if i == len(row)-1 {
+				b.WriteString(v)
+				break
+			}
+			b.WriteString(runewidth.FillRight(v, widths[i]+2))
+		}
+		_, _ = fmt.Fprintln(t.out, b.String())
+	}
+	t.rows = nil
 }
 
 func WriteJSON(out io.Writer, data interface{}) error {

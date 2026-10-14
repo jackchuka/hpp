@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -15,13 +15,23 @@ var rootCmd = &cobra.Command{
 	Use:   "hpp",
 	Short: "HotPepper Gourmet API CLI",
 	Long:  "Search Japanese restaurants using the HotPepper Gourmet API.",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		cmd.SilenceUsage = true
+	},
 }
 
 func Execute() {
+	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
+}
+
+func run(args []string, stdout, stderr io.Writer) int {
+	rootCmd.SetArgs(args)
+	rootCmd.SetOut(stdout)
+	rootCmd.SetErr(stderr)
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 func init() {

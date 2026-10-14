@@ -22,7 +22,7 @@ var shopCmd = &cobra.Command{
 	Use:   "shop",
 	Short: "Search shops by name or phone",
 	Long:  "Search restaurants by name or phone number using the HotPepper Shop API.",
-	Example: `  hpp shop --keyword "居酒屋"
+	Example: `  hpp shop --keyword 九月堂
   hpp shop --tel 0312345678`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if cmd.Flags().Changed("keyword") {

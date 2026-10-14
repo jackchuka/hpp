@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -55,5 +56,34 @@ func TestClientGet_APIError(t *testing.T) {
 	}
 	if apiErr.Code != 2000 {
 		t.Fatalf("expected code 2000, got %d", apiErr.Code)
+	}
+}
+
+func TestClientGet_NetworkErrorDoesNotLeakKey(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	srv.Close()
+
+	c := NewClient("secret-key-123")
+	c.BaseURL = srv.URL
+
+	err := c.Get("/gourmet/v1/", nil, &struct{}{})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if strings.Contains(err.Error(), "secret-key-123") {
+		t.Fatalf("error leaks API key: %v", err)
+	}
+}
+
+func TestClientGet_InvalidBaseURLDoesNotLeakKey(t *testing.T) {
+	c := NewClient("secret-key-123")
+	c.BaseURL = "http://bad host"
+
+	err := c.Get("/gourmet/v1/", nil, &struct{}{})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if strings.Contains(err.Error(), "secret-key-123") {
+		t.Fatalf("error leaks API key: %v", err)
 	}
 }
